@@ -30,5 +30,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "name": "William Chan",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wchan2/password-generator.git"
   }
 }
