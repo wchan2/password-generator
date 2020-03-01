@@ -58,5 +58,7 @@ class PasswordGenerator extends React.Component {
 };
 
 export default function App() {
-  return <PasswordGenerator generatorFunction={generatorFunction('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', 12)} />
+  return <PasswordGenerator
+    generatorFunction={generatorFunction('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', 12)}
+  />
 }
