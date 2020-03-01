@@ -5,7 +5,7 @@ const generatorFunction = (chars, length = 8) => {
   return () => {
     const passwordArr = new Array(length);
     for (let i = 0; i < passwordArr.length; i++) {
-      const randCharIndex = Math.floor(Math.random() * passwordArr.length);
+      const randCharIndex = Math.floor(Math.random() * chars.length);
       passwordArr[i] = chars[randCharIndex];
     }
     return passwordArr.join('');
@@ -57,8 +57,101 @@ class PasswordGenerator extends React.Component {
   }
 };
 
-export default function App() {
-  return <PasswordGenerator
-    generatorFunction={generatorFunction('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', 12)}
-  />
+class PasswordRules extends React.Component {
+  static rules = {
+    uppercase: {
+      chars: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+      message: 'Include capital letters',
+    },
+    lowercase: {
+      chars: 'abcdefghijklmnopqrstuvwxyz',
+      message: 'Include lowercase letters',
+    },
+    numbers: {
+      chars: '0123456789',
+      message: 'Include numbers',
+    },
+    special: {
+      chars: '!@#$%^&*()-_=+[]{}\\|/?<>,.?`~',
+      message: 'Include special characters',
+    },
+  };
+
+  static allChars() {
+    return Object.keys(PasswordRules.rules).reduce((acc, ruleType) => acc + PasswordRules.rules[ruleType].chars, '');
+  }
+
+  constructor(props) {
+    super(props);
+    this.state = {};
+    Object
+      .keys(PasswordRules.rules)
+      .forEach((ruleType) => this.state[ruleType] = true);
+  }
+
+  componentDidMount() {
+    this.props.onChange(PasswordRules.allChars());
+  }
+
+  toggleChars(ruleType) {
+    this.setState({ [ruleType]: !this.state[ruleType] }, () => {
+      const chars = Object
+        .keys(PasswordRules.rules)
+        .filter((ruleType) => this.state[ruleType])
+        .map((ruleType) => PasswordRules.rules[ruleType].chars)
+        .join('');
+      this.props.onChange(chars);
+    });
+  }
+
+  render() {    
+    return (
+      <section>
+        {
+          Object.keys(PasswordRules.rules).map((ruleType, index) => {
+            return (
+              <div key={index}>
+                <label>
+                  <input
+                    type="checkbox"
+                    name={ruleType}
+                    checked={this.state[ruleType]}
+                    onChange={() => this.toggleChars(ruleType)}
+                  />
+                  {PasswordRules.rules[ruleType].message}
+                </label>
+              </div>
+            );
+          })
+        }
+      </section>
+    );
+  }
+}
+
+export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      generatorFunction: generatorFunction(PasswordRules.allChars(), 12),
+    };
+    this.setPasswordRules = this.setPasswordRules.bind(this);
+  }
+
+  setPasswordRules(chars) {
+    this.setState({
+      generatorFunction: generatorFunction(chars, 12),
+    });
+  }
+
+  render() {
+    return (
+      <div>
+        <PasswordGenerator
+          generatorFunction={this.state.generatorFunction}
+        />
+        <PasswordRules onChange={this.setPasswordRules} />
+      </div>
+    );
+  }
 }
